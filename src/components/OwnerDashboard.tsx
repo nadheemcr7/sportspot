@@ -80,6 +80,9 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
   const [walkInSubmitting, setWalkInSubmitting] = useState<boolean>(false);
 
   // Settings Form State
+  const [venueNameInput, setVenueNameInput] = useState<string>(venueSettings.venueName);
+  const [addressInput, setAddressInput] = useState<string>(venueSettings.address);
+  const [phoneInput, setPhoneInput] = useState<string>(venueSettings.phone);
   const [upiIdInput, setUpiIdInput] = useState<string>(venueSettings.ownerUpiId);
   const [merchantNameInput, setMerchantNameInput] = useState<string>(
     venueSettings.ownerMerchantName
@@ -314,6 +317,9 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          venueName: venueNameInput.trim(),
+          address: addressInput.trim(),
+          phone: phoneInput.trim(),
           ownerUpiId: upiIdInput.trim(),
           ownerMerchantName: merchantNameInput.trim(),
           ownerQrCustomUrl: customQrDataUrl || undefined,
@@ -323,7 +329,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
       });
       if (res.ok) {
         await onRefreshState();
-        showToast('Updated Owner GPay QR & Advance Payment settings.');
+        showToast('Updated Venue Address, Contact Phone & Owner GPay QR settings.');
       }
     } finally {
       setSavingSettings(false);
@@ -1100,11 +1106,62 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
               >
                 <div>
                   <p className="text-xs font-mono text-[#A3E635]">
-                    ZERO-GATEWAY GPAY QR CONFIGURATION
+                    VENUE CONTACT & ZERO-GATEWAY GPAY QR CONFIGURATION
                   </p>
                   <h3 className="text-lg font-semibold text-white">
-                    Owner Google Pay UPI & Advance Split Rules
+                    Turf Address, Mobile Number & Owner Google Pay UPI
                   </h3>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label
+                      htmlFor="venue-name-input"
+                      className="block text-xs font-medium text-slate-300 mb-1"
+                    >
+                      Arena / Turf Display Name
+                    </label>
+                    <input
+                      id="venue-name-input"
+                      type="text"
+                      value={venueNameInput}
+                      onChange={(e) => setVenueNameInput(e.target.value)}
+                      className="w-full px-3.5 py-2 bg-[#090D16] border border-slate-700 rounded-lg text-sm text-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="venue-phone-input"
+                      className="block text-xs font-medium text-slate-300 mb-1"
+                    >
+                      Turf Contact Mobile Number
+                    </label>
+                    <input
+                      id="venue-phone-input"
+                      type="text"
+                      value={phoneInput}
+                      onChange={(e) => setPhoneInput(e.target.value)}
+                      placeholder="+91 98450 77210"
+                      className="w-full px-3.5 py-2 bg-[#090D16] border border-slate-700 rounded-lg text-sm font-mono text-white"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="venue-address-input"
+                    className="block text-xs font-medium text-slate-300 mb-1"
+                  >
+                    Full Turf Venue Address (Displayed in Hero & Footer)
+                  </label>
+                  <input
+                    id="venue-address-input"
+                    type="text"
+                    value={addressInput}
+                    onChange={(e) => setAddressInput(e.target.value)}
+                    className="w-full px-3.5 py-2 bg-[#090D16] border border-slate-700 rounded-lg text-sm text-white"
+                  />
                 </div>
 
                 <div>
