@@ -1,0 +1,1442 @@
+# SportSpot – Complete Turf Booking SaaS
+
+SportSpot should be designed as a complete turf booking and management platform, not just a website where customers submit booking requests.
+
+The main idea is that customers can check available slots, book and pay online, receive confirmation, and manage their bookings. At the same time, the turf owner can manage online bookings, walk-in customers, payments, pricing, schedules, and business performance through a separate admin dashboard.
+
+The most important feature: online and walk-in bookings must use the same live availability system. When someone books a slot at the turf counter, that slot should immediately become unavailable online. The same should happen when a customer books online. This prevents double bookings.
+
+## 1. Recommended approach for Google AI Studio
+
+Google AI Studio Build mode currently supports React web apps with a Node.js server-side runtime. It can also integrate Firebase Authentication and Cloud Firestore for user accounts and persistent data, and deploy web apps through Cloud Run.&#x20;
+
+[image](https://www.google.com/s2/favicons?domain=https://ai.google.dev\&sz=32)
+
+Google AI
+
+[image](https://www.google.com/s2/favicons?domain=https://firebase.google.com\&sz=32)
+
+Firebase
+
+[image](https://www.google.com/s2/favicons?domain=https://ai.google.dev\&sz=32)
+
+Google AI
+
+
+
+For SportSpot, use:
+
+| Layer             | Recommended technology                        |
+| ----------------- | --------------------------------------------- |
+| Frontend          | React + TypeScript                            |
+| Styling           | Tailwind CSS                                  |
+| Animations        | Framer Motion                                 |
+| Icons             | Lucide                                        |
+| Charts            | Recharts                                      |
+| Backend           | Node.js server-side APIs                      |
+| Database          | Firebase Cloud Firestore                      |
+| Authentication    | Firebase Authentication                       |
+| Live availability | Firestore real-time listeners                 |
+| Deployment        | Google Cloud Run                              |
+| Payments          | Razorpay integration, with test mode          |
+| Image storage     | Firebase Storage, if available in the project |
+
+When AI Studio asks to enable Firebase, enable it and configure the project. Choose the database region carefully because the initial Firebase project/location selection can also affect the associated Google Cloud resources.&#x20;
+
+[image](https://www.google.com/s2/favicons?domain=https://firebase.google.com\&sz=32)
+
+Firebase
+
+
+
+## 2. How SportSpot should work
+
+[Play Box Arena - Electronic City Phase I, Bengaluru - Playo](https://images.openai.com/static-rsc-4/-RqBFFCw2g-BtjWmjUdkaoveBfFRuax03jdGf2eJOK3RGkwzhZbRxXOgGhcY-XPjPrFg57UUTBx7LS3zsxF8NgtEjbG--5xdz6ILWxuAotUOOEPUjdbNhu8F40GBD9SpTeifmYRXRPXAsBXE3ZWG4Ia5EORLoFRMkwbDTiHGcy4?purpose=inline)
+
+1\. Customer website
+
+Customers discover the turf, view facilities, check availability, choose a slot and book online.
+
+[Sports Turf Booking App UI by Tawhid Hasan on Dribbble](https://images.openai.com/static-rsc-4/np2FENFKOVgsTOkHwhywgsihFyPm7FWrmgRaaEZZ8W-g7AzYz9t1eAXSvn5RZMs1cjvOgOzVZJCioicGGiMVML5ZI7tdFgeKXtVqGizMWOOtaxWg4ljNbeal6EtDGlFGF-5a1f_3v2_Ua44TAvdBDAiBQ6BDl14Ne9eSqMqO684?purpose=inline)
+
+2\. Live booking system
+
+Available slots update automatically. A booked or temporarily reserved slot cannot be booked by another customer.
+
+[Dashboard Animation designs, themes, templates and downloadable graphic elements on Dribbble](https://images.openai.com/static-rsc-4/YAwqtQmvVD0rgEQ4zHZWohXztPFTAM4UG8gZB7WLGClz4ZbJ-0Z6RCv7M91w7p81L1HK6twQYjIz4xNTHHXiNr5uqA-xcEVzdkP8EEM9NW1pN4vTj72N2T4bhxHY7layyAUtA1l1_t59BIgZfj9UA3FhpBXN4W0FTfxDYa66pxM?purpose=inline)
+
+3\. Owner dashboard
+
+The owner manages bookings, walk-in customers, courts, prices, payments, schedules and revenue.
+
+[Sportsfaciliteter](https://images.openai.com/static-rsc-4/YSWPSeukXRgWpsCgKbQiP38xu3khAJnUAQYfknf5UWmaAoFf5EUNQTclH6UuCtIbEbUT5TBcSwtRmdwUwsafVQd7_6a-3q5iocQEw0jI-uTst5YM6IuBtlFAgq_HkmY4aKQqQOtkAGBf9m8uT7ZQr3dufQDJW4-F2pWdBkuqIts?purpose=inline)
+
+4\. Walk-in booking
+
+The owner can directly book a time slot for a customer who arrives at the venue. The slot immediately disappears from online availability.
+
+## 3. Complete paste-ready prompt for Google AI Studio
+
+Copy the entire prompt below into Google AI Studio → Build mode.
+
+
+
+Main project prompt
+
+Full-stack SaaS
+
+
+
+```
+
+Act as a senior full-stack software architect, SaaS product designer, UI/UX designer, backend engineer, database architect and security engineer.
+
+Build a complete, premium, production-oriented full-stack SaaS web application called SPORTSPOT.
+
+PROJECT NAME:
+SportSpot – Smart Turf Booking & Management Platform.
+
+CORE BUSINESS IDEA:
+SportSpot is a digital turf booking and management platform for a physical sports turf business.
+
+I am the turf owner. Customers should be able to visit my website, view the turf, explore facilities, check available time slots, book a slot, make payment and come to the physical turf to play.
+
+The owner must have a completely separate and secure admin login and an advanced management dashboard.
+
+The platform must also support customers who physically walk into the turf. The owner should be able to create a walk-in booking directly from the admin dashboard.
+
+MOST IMPORTANT REQUIREMENT:
+Online bookings and walk-in bookings MUST share the same backend availability system and database.
+
+Whenever a customer books online or the owner creates a walk-in booking, the availability must update in real time across the entire application.
+
+Two customers must never be able to successfully book the same court at overlapping times.
+
+Do not build just a static website, landing page, frontend prototype or mock dashboard. Build a functioning full-stack application with persistent data, authentication, secure server-side operations and real booking logic.
+
+==================================================
+1. REQUIRED TECHNOLOGY STACK
+==================================================
+
+Use the following architecture:
+
+Frontend:
+- React
+- TypeScript
+- Tailwind CSS
+- Framer Motion for smooth animations
+- Lucide React for icons
+- Recharts for analytics and dashboard charts
+- React Router or an equivalent routing solution
+
+Backend:
+- Node.js server-side runtime
+- Secure server-side API endpoints
+- Firebase Admin SDK for trusted backend operations
+
+Database:
+- Firebase Cloud Firestore
+
+Authentication:
+- Firebase Authentication
+- Email and password authentication
+- Google sign-in if supported
+- Secure role-based access control
+
+Real-time functionality:
+- Firestore real-time listeners
+- Live slot availability
+- Live dashboard booking updates
+
+Hosting:
+- Google Cloud Run-compatible application
+
+Payments:
+- Razorpay integration with test mode
+- Support cash and UPI payments at the venue
+- Never expose payment secrets in frontend code
+
+Storage:
+- Firebase Storage for venue images, customer profile images and other uploaded assets, when available.
+
+Use environment variables and a secure secrets configuration for all API keys and credentials.
+
+If Firebase integration is offered, enable and configure Firebase.
+
+Use a clean and scalable project structure with separate frontend, backend, components, pages, services, hooks, utilities, types, configuration and database logic.
+
+==================================================
+2. BRAND IDENTITY AND VISUAL DESIGN
+==================================================
+
+Create a premium sports-tech brand called SPORTSPOT.
+
+Brand feeling:
+- Modern
+- Professional
+- Sporty
+- Premium
+- Energetic
+- Interactive
+- Trustworthy
+
+Visual direction:
+A high-end sports stadium mixed with a premium SaaS product interface.
+
+COLOR PALETTE:
+- Primary background: Deep navy / near-black.
+- Secondary background: Dark charcoal.
+- Primary accent: Electric lime green.
+- Secondary accent: Bright white.
+- Supporting accent: Subtle orange.
+- Success: Green.
+- Warning: Amber.
+- Error: Red.
+
+Use a polished typography system such as Inter, Manrope or Space Grotesk.
+
+PUBLIC WEBSITE DESIGN:
+
+Create a visually impressive landing page with:
+
+1. A premium hero section with a large sports turf visual.
+2. Stadium floodlight effects and subtle animated lighting.
+3. A realistic-looking football/cricket turf environment.
+4. Animated pitch markings and layered graphical elements.
+5. Attractive headline typography.
+6. An animated Book Your Slot call-to-action.
+7. A live availability preview.
+8. Smooth transitions between page sections.
+9. Attractive sports cards.
+10. Premium hover effects.
+11. Subtle gradients and glassmorphism.
+12. Scroll-triggered animations.
+13. Responsive layouts for mobile, tablet and desktop.
+
+Do not make the design look like a basic college project.
+
+The UI should look like a funded sports-tech startup product.
+
+Use a carefully designed visual hierarchy. Avoid excessive animation, clutter and unnecessary gradients.
+
+Create proper loading animations, skeleton screens, empty states, toast notifications, modal dialogs and error states.
+
+Do not use generic placeholder emojis as icons.
+
+Use actual sports imagery or well-designed custom CSS/SVG visuals. Use replaceable image assets rather than relying on random external image URLs.
+
+==================================================
+3. USER ROLES AND AUTHENTICATION
+==================================================
+
+Create two different user experiences.
+
+ROLE 1: CUSTOMER
+
+Customers can:
+- Register.
+- Log in.
+- View the public website.
+- Explore turf facilities.
+- Browse available courts.
+- Check available dates and times.
+- Book slots.
+- Make payments.
+- Receive booking confirmation.
+- View booking history.
+- Cancel bookings according to the cancellation policy.
+- View their profile.
+
+ROLE 2: OWNER / ADMIN
+
+The turf owner has a separate protected admin dashboard.
+
+Admin capabilities:
+- Secure admin login.
+- View business analytics.
+- Manage all courts and turfs.
+- Manage online bookings.
+- Manage walk-in bookings.
+- Manage customers.
+- Manage payments.
+- Manage pricing.
+- Configure business hours.
+- Block unavailable dates.
+- Manage maintenance schedules.
+- View revenue reports.
+- Export reports.
+- Configure business settings.
+
+SECURITY:
+- Implement proper role-based access control.
+- Customers must never access admin pages.
+- Admin routes must be protected on both frontend and backend.
+- Never trust a role supplied by the frontend.
+- Customers must not be able to assign themselves an admin role.
+- Set the initial owner role using a trusted server-side bootstrap process or Firebase custom claims.
+- Provide clear setup instructions for creating the first owner account.
+- Never hardcode administrator credentials in the public source code.
+
+==================================================
+4. CUSTOMER WEBSITE – COMPLETE PAGES
+==================================================
+
+PAGE 1: HOME
+
+Design a premium homepage.
+
+Sections:
+
+A. Navigation bar:
+- SportSpot logo.
+- Home.
+- About.
+- Facilities.
+- Pricing.
+- Book Now.
+- Contact.
+- Login / Sign Up.
+- Responsive mobile navigation.
+
+B. Hero:
+Headline:
+"Your Game. Your Turf. Your Time."
+
+Supporting text:
+"Find your perfect playing slot and experience sports without limits."
+
+Buttons:
+- Book Your Slot.
+- Explore Turf.
+
+Display an attractive turf visual with animated lighting and sports elements.
+
+C. Quick booking widget:
+- Select sport.
+- Select court.
+- Select date.
+- Select duration.
+- Check availability.
+
+D. Facilities:
+Show attractive facility cards with:
+- Artificial grass.
+- Floodlights.
+- Changing rooms.
+- Parking.
+- Drinking water.
+- Equipment availability.
+- Seating and spectator area.
+
+Only display facilities configured by the owner.
+
+E. How it works:
+1. Choose your sport.
+2. Select an available slot.
+3. Complete booking.
+4. Come and play.
+
+F. Pricing preview.
+
+G. Customer testimonials and reviews.
+
+H. Frequently asked questions.
+
+I. Contact section.
+
+J. Professional footer with social links and business information.
+
+PAGE 2: BOOKING PAGE
+
+This is the most important customer page.
+
+Create a seamless interactive booking experience.
+
+Step 1: Select sport.
+
+Support owner-configurable sport categories such as:
+- Football.
+- Cricket.
+- Box cricket.
+- Other sports configured by the owner.
+
+Step 2: Select court.
+
+Display:
+- Court name.
+- Court image.
+- Sport supported.
+- Capacity.
+- Surface information.
+- Facilities.
+
+Step 3: Select date.
+
+Create a beautiful calendar.
+
+Customers must be able to:
+- Navigate between dates.
+- See available dates.
+- See fully booked dates.
+- See holiday or closed dates.
+- Select a date.
+
+Do not allow bookings in the past.
+
+Step 4: Select time.
+
+Display time slots using attractive interactive cards.
+
+Slot states:
+- Available: green.
+- Selected: bright accent.
+- Booked: grey.
+- Temporarily held: amber.
+- Maintenance: disabled.
+- Closed: disabled.
+
+Show:
+- Start time.
+- End time.
+- Duration.
+- Total price.
+
+Enable real-time updates when another customer or the admin changes availability.
+
+Allow customers to select configurable booking durations, such as:
+- 30 minutes.
+- 60 minutes.
+- 90 minutes.
+- 120 minutes.
+
+The owner must be able to configure allowed durations and the base time interval.
+
+Support consecutive slot selection.
+
+Do not allow invalid overlapping selections.
+
+Step 5: Booking summary.
+
+Display:
+- Customer name.
+- Court.
+- Sport.
+- Booking date.
+- Start time.
+- End time.
+- Duration.
+- Base price.
+- Discounts.
+- Taxes, if configured.
+- Final amount.
+
+Step 6: Customer information.
+
+Collect:
+- Full name.
+- Mobile number.
+- Email address.
+
+Step 7: Payment.
+
+Provide available methods:
+- Razorpay online payment.
+- UPI payment where integrated.
+- Pay at venue, if allowed by the owner.
+
+Payment must be securely verified by the backend.
+
+Step 8: Confirmation.
+
+After successful booking show:
+- Booking reference number.
+- Booking details.
+- Payment status.
+- QR code or booking verification code.
+- Download receipt.
+- Add to calendar.
+- Go to My Bookings.
+
+Never show successful booking confirmation before the backend has successfully confirmed the reservation.
+
+==================================================
+5. CUSTOMER ACCOUNT DASHBOARD
+==================================================
+
+Build a separate customer dashboard.
+
+Navigation:
+- Overview.
+- My Bookings.
+- Upcoming Bookings.
+- Booking History.
+- Payments.
+- My Profile.
+- Support.
+- Logout.
+
+OVERVIEW:
+Show:
+- Welcome message.
+- Upcoming booking.
+- Number of total bookings.
+- Recent booking.
+- Quick Book Again action.
+
+MY BOOKINGS:
+
+Create a modern booking management interface.
+
+Each booking card should display:
+- Booking ID.
+- Court.
+- Date.
+- Time.
+- Duration.
+- Amount.
+- Payment status.
+- Booking status.
+
+Available actions:
+- View details.
+- Download invoice.
+- Cancel booking if eligible.
+- Reschedule booking if allowed.
+
+Show booking status badges:
+- Confirmed.
+- Pending.
+- Completed.
+- Cancelled.
+- Expired.
+
+Do not allow customers to modify bookings belonging to other users.
+
+MY PROFILE:
+- Update customer name.
+- Update phone number.
+- View email.
+- Change password using secure authentication flow.
+
+==================================================
+6. OWNER ADMIN DASHBOARD
+==================================================
+
+This is one of the most important parts.
+
+Create a professional SaaS dashboard that looks like a premium business management product.
+
+Admin dashboard must have:
+
+SIDEBAR:
+- Overview.
+- Booking Management.
+- Walk-in Bookings.
+- Calendar.
+- Courts Management.
+- Customers.
+- Payments.
+- Pricing.
+- Offers and Coupons.
+- Reviews.
+- Reports & Analytics.
+- Settings.
+- Logout.
+
+TOP NAVIGATION:
+- Search.
+- Date selector.
+- Notification icon.
+- Owner profile.
+- Quick action button.
+
+ADMIN OVERVIEW:
+
+Display beautiful analytics cards.
+
+Cards:
+1. Today's Revenue.
+2. Today's Bookings.
+3. Total Customers.
+4. Available Slots.
+5. Occupancy Rate.
+6. Pending Payments.
+
+Each card should include:
+- Large metric.
+- Relevant icon.
+- Comparison with previous period, when data exists.
+- Small trend indicator.
+
+CHARTS:
+
+Use Recharts to create:
+- Daily revenue chart.
+- Weekly revenue chart.
+- Monthly revenue chart.
+- Booking trends.
+- Court occupancy chart.
+- Online vs walk-in bookings.
+- Payment method distribution.
+
+Create filters:
+- Today.
+- Last 7 days.
+- Last 30 days.
+- This month.
+- Custom date range.
+
+All charts must be based on actual Firestore records.
+
+Do not generate fake revenue figures.
+
+If using demonstration records, label them clearly as demo data.
+
+RECENT BOOKINGS:
+
+Create a table with:
+- Booking ID.
+- Customer.
+- Court.
+- Date.
+- Time.
+- Booking source.
+- Payment.
+- Status.
+- Actions.
+
+Quick actions:
+- View booking.
+- Edit where permitted.
+- Cancel booking.
+- Mark payment as received when authorized.
+
+TODAY'S SCHEDULE:
+
+Create a visual schedule showing:
+- Each court.
+- Time slots.
+- Customer bookings.
+- Walk-ins.
+- Available periods.
+- Maintenance blocks.
+
+Use different visual colors for each booking state.
+
+==================================================
+7. WALK-IN BOOKING MANAGEMENT
+==================================================
+
+This is a core business feature.
+
+The owner should be able to register customers who visit the physical turf.
+
+Create a large "New Walk-in Booking" button on the admin dashboard.
+
+When clicked, open a modern booking modal or dedicated page.
+
+Collect:
+- Customer name.
+- Mobile number.
+- Sport.
+- Court.
+- Date.
+- Start time.
+- Duration.
+- Total amount.
+- Payment method.
+- Payment status.
+- Optional notes.
+
+Walk-in booking process:
+
+1. Admin selects court.
+2. Admin selects date.
+3. Admin views available slots.
+4. Admin selects a time slot.
+5. Backend verifies slot availability.
+6. Booking is saved.
+7. Selected time is immediately blocked for online customers.
+8. All connected customer booking pages update automatically.
+
+Support:
+- Cash payment.
+- UPI payment.
+- Card payment at venue.
+- Unpaid booking, if owner policy allows it.
+
+Mark whether a reservation originated from:
+- Online.
+- Walk-in.
+- Admin-created.
+
+Display booking source in all admin booking lists and analytics.
+
+==================================================
+8. REAL-TIME BOOKING ENGINE
+==================================================
+
+Implement a reliable reservation system.
+
+This is a non-negotiable requirement.
+
+Use server-authoritative booking operations and Firestore transactions.
+
+Do not rely only on disabling frontend buttons.
+
+Each court must have an independently managed availability schedule.
+
+Use atomic base-time-unit slot locking.
+
+For example, if the base interval is 30 minutes, a 90-minute reservation must lock three consecutive time units.
+
+Use deterministic slot identifiers based on:
+
+courtId + localDate + startTime.
+
+When a customer attempts to reserve a slot:
+
+1. Authenticate the customer.
+2. Validate the selected court and date.
+3. Validate the duration and operating hours.
+4. Read all required slot lock documents inside a Firestore transaction.
+5. Verify every selected unit is available.
+6. Create a temporary reservation hold.
+7. Prevent any competing booking from taking those time units.
+8. Start the payment process.
+9. Verify payment on the backend.
+10. Change the booking to confirmed.
+11. Update all corresponding slot locks.
+12. Publish real-time availability changes.
+
+Temporary holds must expire after a configurable period, for example five minutes.
+
+When a hold expires or payment fails, release the slots.
+
+The server must re-check expiration before allowing a new reservation to take over an expired hold.
+
+For walk-in bookings, use the same transactional availability check, but confirm the booking directly according to the owner's payment policy.
+
+For confirmed bookings, do not release a lock unless a valid cancellation or rescheduling transaction succeeds.
+
+Use server timestamps for trusted events.
+
+Store booking times consistently, retaining the venue's configured timezone and local booking date.
+
+Default timezone: Asia/Kolkata.
+Default currency: INR (₹).
+Allow the owner to change these business settings.
+
+Handle edge cases:
+- Two users clicking the same slot simultaneously.
+- Payment pending.
+- Payment failure.
+- Payment callback arriving twice.
+- Customer closing the browser during payment.
+- Expired booking holds.
+- Admin creating a walk-in while a customer is selecting the same slot.
+- Rescheduling to an unavailable slot.
+- Cancellation and refund processing.
+
+Use idempotency for payment callbacks and booking creation so repeated requests cannot create duplicate bookings.
+
+==================================================
+9. COURTS AND TURF MANAGEMENT
+==================================================
+
+Create a Courts Management module.
+
+The owner can:
+
+- Add a new court.
+- Edit court details.
+- Upload court images.
+- Delete or deactivate a court.
+- Set supported sports.
+- Set capacity.
+- Set facilities.
+- Set court opening hours.
+- Set the base pricing.
+- Set the booking duration options.
+- Configure slot interval.
+- View the court's bookings.
+
+Initial demonstration configuration:
+- SportSpot Main Turf.
+- Court 1.
+- Court 2.
+
+These must be sample records that the owner can edit or remove.
+
+Support multiple courts and make the architecture scalable to multiple venues in the future.
+
+==================================================
+10. PRICING AND SCHEDULE MANAGEMENT
+==================================================
+
+Create a complete pricing engine.
+
+The owner can configure:
+
+- Weekday pricing.
+- Weekend pricing.
+- Morning pricing.
+- Afternoon pricing.
+- Evening pricing.
+- Peak-hour pricing.
+- Off-peak pricing.
+- Special holiday pricing.
+- Custom duration pricing.
+
+Create opening and closing time settings.
+
+Allow the owner to configure:
+- Weekday schedules.
+- Weekend schedules.
+- Public holidays.
+- Special opening days.
+- Temporary closures.
+- Maintenance blocks.
+- Court-specific availability.
+
+The calendar must reflect these configurations.
+
+Prevent customers from booking outside working hours or during blocked periods.
+
+Changes to pricing must not silently alter prices for already confirmed bookings.
+
+Store an immutable price snapshot in every booking.
+
+==================================================
+11. PAYMENT MANAGEMENT
+==================================================
+
+Create a complete payment management interface.
+
+Support:
+- Razorpay online payments.
+- Cash at venue.
+- UPI at venue.
+- Card at venue.
+- Paid and unpaid status.
+
+Payment records must contain:
+- Payment ID.
+- Booking ID.
+- Customer.
+- Amount.
+- Payment method.
+- Payment status.
+- Payment date.
+- Provider transaction ID where applicable.
+
+RAZORPAY:
+- Create payment orders server-side.
+- Use test credentials during development.
+- Verify payment signatures on the server.
+- Implement secure webhooks.
+- Process webhook events idempotently.
+- Only confirm paid online reservations after trusted verification.
+- Never expose secret keys.
+- Never save raw card details.
+
+Allow the admin to:
+- View payment records.
+- Filter by date and method.
+- View failed transactions.
+- Mark valid cash or UPI payments as received.
+- Initiate refunds when supported.
+- Record manual refunds if processed outside the platform.
+
+If payment credentials have not been configured, show a clear configuration warning and retain the pay-at-venue option when enabled.
+
+Do not simulate a successful real-money payment.
+
+==================================================
+12. CUSTOMER MANAGEMENT
+==================================================
+
+Create a Customers module for the owner.
+
+Display:
+- Customer name.
+- Mobile number.
+- Email.
+- Total bookings.
+- Total amount paid.
+- Last visit.
+- Registration date.
+
+Features:
+- Search customer.
+- Filter customers.
+- View booking history.
+- View payment history.
+- Add internal notes.
+- Export customer list.
+
+Do not expose personal customer data to other customers.
+
+==================================================
+13. OFFERS AND COUPONS
+==================================================
+
+Build coupon management.
+
+The owner can:
+- Create discount codes.
+- Choose percentage or fixed discounts.
+- Set validity dates.
+- Set maximum uses.
+- Set minimum booking value.
+- Set eligible courts.
+- Activate or deactivate codes.
+
+Customers can apply valid discount codes during checkout.
+
+Validate coupons on the server and prevent misuse.
+
+==================================================
+14. NOTIFICATIONS
+==================================================
+
+Implement an in-app notification system.
+
+Customer notifications:
+- Booking confirmed.
+- Payment successful.
+- Booking cancelled.
+- Refund update.
+- Booking reminder.
+
+Admin notifications:
+- New online booking.
+- New walk-in booking.
+- Payment received.
+- Booking cancellation.
+- Failed online payment.
+- Upcoming reservations.
+
+Use an unread notification count and a notification panel.
+
+Prepare email notifications using a configurable email provider integration.
+
+Do not claim an email or SMS has been sent unless the provider confirms successful delivery.
+
+==================================================
+15. REPORTS AND ANALYTICS
+==================================================
+
+Create a separate Reports page.
+
+Reports:
+- Total revenue.
+- Daily revenue.
+- Weekly revenue.
+- Monthly revenue.
+- Booking count.
+- Court utilization.
+- Peak booking hours.
+- Customer retention.
+- Online booking count.
+- Walk-in booking count.
+- Payment method summary.
+- Cancellation report.
+
+Filters:
+- Date range.
+- Court.
+- Booking source.
+- Payment status.
+
+Add CSV export functionality.
+
+Calculate revenue from valid recorded payments, not merely confirmed reservations.
+
+Avoid counting failed, cancelled or refunded payments as normal revenue.
+
+==================================================
+16. FIRESTORE DATABASE ARCHITECTURE
+==================================================
+
+Design a structured database with collections such as:
+
+users
+venues
+courts
+bookings
+slotLocks
+payments
+coupons
+notifications
+reviews
+blockedSlots
+businessSettings
+auditLogs
+
+Suggested important fields:
+
+USERS:
+uid, name, email, phone, createdAt, updatedAt.
+
+VENUES:
+venueId, name, description, address, contact, timezone, currency, openingHours, facilities, images, active.
+
+COURTS:
+courtId, venueId, name, sportTypes, capacity, surface, facilities, images, active, pricingConfig, slotIntervalMinutes.
+
+BOOKINGS:
+bookingId, userId, venueId, courtId, customerName, customerPhone, customerEmail, bookingDate, startTime, endTime, timezone, durationMinutes, source, status, paymentStatus, paymentMethod, priceSnapshot, couponId, createdAt, updatedAt, cancellationDetails.
+
+SLOTLOCKS:
+slotId, courtId, bookingId, status, holdExpiresAt, updatedAt.
+
+PAYMENTS:
+paymentId, bookingId, userId, amount, currency, method, providerReference, status, verifiedAt, createdAt.
+
+COUPONS:
+couponId, code, discountType, discountValue, startDate, endDate, usageLimit, usedCount, active.
+
+NOTIFICATIONS:
+notificationId, recipientId, title, message, type, read, createdAt.
+
+AUDIT LOGS:
+logId, actorId, action, affectedResource, timestamp, relevantMetadata.
+
+Use appropriate indexes for common queries and Firestore query limitations.
+
+Use Firestore batched writes or transactions where appropriate.
+
+Create reusable repository and service functions instead of writing raw database calls throughout UI components.
+
+==================================================
+17. BACKEND API AND BUSINESS LOGIC
+==================================================
+
+Implement secure server-side endpoints or equivalent server-side functions for:
+
+POST /api/bookings/hold
+POST /api/bookings/confirm
+POST /api/bookings/walk-in
+POST /api/bookings/cancel
+POST /api/bookings/reschedule
+GET /api/availability
+GET /api/bookings/my
+GET /api/admin/bookings
+GET /api/admin/analytics
+POST /api/payments/create-order
+POST /api/payments/webhook
+POST /api/admin/payments/record
+POST /api/admin/courts
+PUT /api/admin/courts
+POST /api/admin/blocked-slots
+
+Protect endpoints based on authenticated identity and role.
+
+Validate all user input on the backend.
+
+Implement:
+- Consistent response formats.
+- Proper HTTP status codes.
+- Meaningful error messages.
+- Input validation.
+- Idempotency.
+- Server-side authorization.
+- Secure logging.
+- Rate limiting on sensitive operations where possible.
+
+Do not trust client-calculated booking prices or payment statuses.
+
+Recalculate prices on the server using trusted pricing configuration.
+
+==================================================
+18. UI COMPONENTS AND INTERACTION QUALITY
+==================================================
+
+Build reusable components:
+
+- Navbar.
+- Footer.
+- Hero section.
+- Sport cards.
+- Court cards.
+- Booking calendar.
+- Time-slot grid.
+- Booking wizard.
+- Checkout summary.
+- Payment modal.
+- Booking confirmation.
+- QR code display.
+- Customer dashboard sidebar.
+- Admin dashboard sidebar.
+- Analytics cards.
+- Revenue charts.
+- Booking table.
+- Walk-in booking modal.
+- Schedule calendar.
+- Customer table.
+- Pricing editor.
+- Notification dropdown.
+- Profile menu.
+- Confirmation dialogs.
+- Toast notifications.
+- Loading skeletons.
+- Empty states.
+
+Every visible button must perform its intended action.
+
+Every form must have working validation.
+
+Avoid dead links and placeholder buttons.
+
+Build responsive layouts with mobile-first booking functionality.
+
+==================================================
+19. SECURITY AND VALIDATION
+==================================================
+
+Implement Firestore Security Rules and verify them carefully.
+
+Rules must enforce:
+- Customers can access only their own protected information.
+- Customers cannot change their role.
+- Customers cannot write trusted booking or payment status fields directly.
+- Customers cannot write slot locks directly.
+- Only authorized owners/admins can perform management actions.
+- Sensitive operations must execute on the trusted server.
+
+Implement:
+- Authentication verification.
+- Authorization checks.
+- Input sanitization.
+- Secure secrets management.
+- Payment signature verification.
+- Rate limiting.
+- Protection against duplicate bookings.
+- Safe error handling.
+
+Use the Firebase Admin SDK only in trusted server-side code.
+
+Do not place service account credentials or payment secrets inside frontend bundles.
+
+==================================================
+20. DEMONSTRATION AND INITIAL SETUP
+==================================================
+
+Create an owner onboarding process.
+
+On first startup, the owner should be able to configure:
+
+- Business name.
+- Turf address.
+- Phone number.
+- Business hours.
+- Currency.
+- Timezone.
+- Courts.
+- Sport types.
+- Slot durations.
+- Pricing.
+- Booking policies.
+
+Provide a secure initial admin setup process.
+
+Create a small set of clearly labelled sample courts, sample customers and sample bookings for demonstration.
+
+The owner should be able to remove demo data before using the platform for real customers.
+
+Do not hardcode fake users into production authentication.
+
+Provide a clear environment variable template for all required integrations.
+
+==================================================
+21. TESTING AND QUALITY ASSURANCE
+==================================================
+
+Do not consider the project complete merely because the homepage renders.
+
+Test the following end-to-end workflows:
+
+TEST 1:
+A customer registers, logs in, selects a date, chooses an available slot, completes a valid payment flow and receives a confirmed booking.
+
+TEST 2:
+A second customer opens the same date and sees that the previously booked slot is unavailable.
+
+TEST 3:
+The owner logs in and sees the first booking in the admin dashboard.
+
+TEST 4:
+The owner creates a walk-in booking.
+
+TEST 5:
+The customer booking page immediately reflects the walk-in reservation.
+
+TEST 6:
+Two customers attempt to reserve overlapping slots simultaneously. Only one reservation must succeed.
+
+TEST 7:
+A payment fails or a booking hold expires. The affected slot must become available again.
+
+TEST 8:
+A customer cancels an eligible booking. Availability and booking records must update correctly.
+
+TEST 9:
+An unauthorized customer attempts to open an admin route. Access must be denied.
+
+TEST 10:
+The owner filters reports and exports a CSV file.
+
+TEST 11:
+A customer refreshes the page and can still see their bookings.
+
+TEST 12:
+An online payment webhook is received more than once. The same booking must not be confirmed or charged twice.
+
+Create automated tests for the booking engine, pricing calculation, access control and reservation conflict logic where possible.
+
+If a test cannot be executed in the current environment, clearly explain what is required to execute it instead of claiming it passed.
+
+==================================================
+22. FINAL ACCEPTANCE REQUIREMENTS
+==================================================
+
+The completed SportSpot application must have:
+
+1. Beautiful, premium public website.
+2. Responsive mobile and desktop design.
+3. Customer registration and login.
+4. Separate secure owner login.
+5. Customer dashboard.
+6. Owner admin dashboard.
+7. Real Firestore database.
+8. Working booking engine.
+9. Live slot availability.
+10. Walk-in booking management.
+11. Double-booking prevention.
+12. Court management.
+13. Pricing management.
+14. Payment integration structure.
+15. Customer management.
+16. Revenue analytics.
+17. Booking history.
+18. Cancellation and rescheduling workflows.
+19. Notifications.
+20. Working CSV reports.
+21. Firestore security rules.
+22. Server-side validation.
+23. Error handling.
+24. Responsive interactions.
+25. Deployment and setup documentation.
+
+IMPORTANT BUILD INSTRUCTIONS:
+
+- Build the complete application, not just its design.
+- Do not create fake frontend-only functionality.
+- Do not use localStorage as the main database.
+- Use Firebase for persistent data.
+- Do not create fake payment success.
+- Implement real transactional booking logic.
+- Keep customer, owner and backend operations separated.
+- Use reusable TypeScript components and well-organized files.
+- Ensure the app runs without TypeScript errors or console errors.
+- Verify each major workflow before moving forward.
+- Fix discovered errors rather than hiding them.
+- Maintain a consistent design throughout all pages.
+- If a feature requires external credentials, implement its secure integration structure and clearly explain the missing configuration.
+- Do not silently omit a requirement because it is complex.
+
+Start by creating the entire application architecture and the main functional pages. Then implement authentication, database operations, booking transactions, walk-in management, payments, admin analytics, and automated testing.
+
+Continue working through the requirements until the application is functional and the acceptance criteria have been checked.
+
+The final result should look and work like a premium commercial sports booking SaaS product called SPORTSPOT.
+
+```
+
+## 4. Important screens you should expect to get
+
+These are the main interfaces that should be present in the final product.
+
+Customer-facing website
+
+[TurfEase Sports Platform — Sports · Built with Blink](https://images.openai.com/static-rsc-4/jcvwnbI3ZjWmQLUUIxIfTeM-4zPeUwdDSf9gDHWg3UNm9e16uQLpUjpKDD2Olvb6NmpeJ0m9uVjt5RP36R4sRfTll548pkTaY4vQvhEesYqWKx7Ber1IuBZL9RNOWZSlnzs_6lwua2EL7S5xEveT0VvmhntxSf_mFAY2XvhceAQ?purpose=inline)
+
+[Amare Sport Club - Court Reservation & Checkout Page by Dharaka Pranamya for Imagine Odyssey on Dribbble](https://images.openai.com/static-rsc-4/10E2qAdpXtXSuO1v782mQgvXKGOe2esMrV8xB3SXf2OCFfi85hsshDWXAESAhVwX-m2UEtVCKfUM_q_b4l24nTovwj3B1Na0h4oCHEXInUgEyD1eCTTuFZuP-CZ5f_fB3dOwpz-j2iYmlb5pp1OJkEFjodiDBf6Wc2UrWA9bLKA?purpose=inline)
+
+[SpotVibe - Sports Venue Booking System | Codester](https://images.openai.com/static-rsc-4/spC-JIDlgscBEeGZleiiG8iuGZdvgrraNysgqWWOUhRW6biJsnuBjXZUzd3M71FEkFex6W6OAgveSzm9YChK8sb9wDh8pm2megS3r8X8XYLPsDhqTCgXowd2YYUpOhzO65TdpzalCRf9iR_I65nqBmZ9pLFwN5f_GOvgdb8xMHY?purpose=inline)
+
+15
+
+Owner-facing SaaS dashboard
+
+[SaaS Dashboard Dark Mode — GPT Image 2 Prompt | Image2](https://images.openai.com/static-rsc-4/DcmlMVy2vgkjquHzeldH7LmIuxVigSsByPcFSn7lbBMKX4B_9F_opUtJk7JyMGifxq0bzL_IYWGZnzXKkViylJHDMHThYDEBbLL3AVSMDHZBlk__9XPurFRmx1s35kH45CdMx2t5RgC_JYSzDlPPrZ054K5LWNrpsXkEALy_PYo?purpose=inline)
+
+[Tennivo Reviews 2026: Details, Pricing, & Features | G2](https://images.openai.com/static-rsc-4/SKFuq8hH0W5K_mJLIZj2_9jvNt-ncdDcjyRF7P2-8aje5BXecCus5L3YGRYAPYOnUierKPvyiysZAmgv2DaaAr_T1uBsYUUSuG3g5z9E_hRpy-B0F2f1zkpItkluTDkkSwGA17QQ4RtSCE2NkdhaEPb9glyipX4TUDXRKyTpsEs?purpose=inline)
+
+[SpotBook: Streamline Your Sports Venue Management](https://images.openai.com/static-rsc-4/qJU-zAxG1jUZ3Cm3PDWFiGNPSAU6VJqOqYvxXslIy9JapdAI5NVyY5DO_hU1iZbRuUhySYgyV5L5_iX3bq4O-5eHH5K526TQ6v0hr2VB9HzAJuJbYIDtZVHT6S2HdnB735K48z-ALtjddlSRPSNa9pBh8ZqQGINrTSS8OZ7hGKY?purpose=inline)
+
+10
+
+Booking and calendar management
+
+[Quadra Fácil | Aluguel de Quadras Esportivas e Gestão Simplificada](https://images.openai.com/static-rsc-4/lMSJ1xuzBUCXoqcTsgPcelTIY91JqZz0T207u8-MlwWRi7uRt76YUYtPAWdBXjsQHEPGgSiPyxa1gXLic4t3vlSRwHSueBYFtK1dB0VT6EQR1KXwP6IjmRFAO4klcytXNBsURah-TDtn4qN1zAhqKh4ncKtn_Q1EdqSHgjJcRKA?purpose=inline)
+
+[Tennivo Reviews 2026: Details, Pricing, & Features | G2](https://images.openai.com/static-rsc-4/SKFuq8hH0W5K_mJLIZj2_9jvNt-ncdDcjyRF7P2-8aje5BXecCus5L3YGRYAPYOnUierKPvyiysZAmgv2DaaAr_T1uBsYUUSuG3g5z9E_hRpy-B0F2f1zkpItkluTDkkSwGA17QQ4RtSCE2NkdhaEPb9glyipX4TUDXRKyTpsEs?purpose=inline)
+
+[Amare Sport Club - Court Reservation & Checkout Page by Dharaka Pranamya for Imagine Odyssey on Dribbble](https://images.openai.com/static-rsc-4/10E2qAdpXtXSuO1v782mQgvXKGOe2esMrV8xB3SXf2OCFfi85hsshDWXAESAhVwX-m2UEtVCKfUM_q_b4l24nTovwj3B1Na0h4oCHEXInUgEyD1eCTTuFZuP-CZ5f_fB3dOwpz-j2iYmlb5pp1OJkEFjodiDBf6Wc2UrWA9bLKA?purpose=inline)
+
+13
+
+## 5. Example of the most important booking workflow
+
+This illustrates how the backend should behave.
+
+## SportSpot – Live booking example
+
+Court 1 · November 13
+
+Live availability
+
+06:00 – 07:00\
+
+
+Available
+
+
+
+07:00 – 08:00\
+
+
+Booked online
+
+
+
+08:00 – 09:00\
+
+
+Available
+
+
+
+09:00 – 10:00\
+
+
+Walk-in booking
+
+
+
+10:00 – 11:00\
+
+
+Available
+
+
+
+11:00 – 12:00\
+
+
+Booked online
+
+
+
+Illustrative sample schedule, not a live SportSpot database.
+
+1. Customer selects 08:00–09:00.
+2. Backend temporarily locks the required time units.
+3. Customer completes payment.
+4. Backend verifies payment and confirms booking.
+5. Other customers immediately see the slot as booked.
+
+Owner adds a walk-in booking for 10:00–11:00
+
+The customer website automatically updates.
+
+## 6. Additional prompts to use after the main build
+
+Don't try to fix everything by asking AI Studio to regenerate the entire project. Use these follow-up prompts one by one after it generates the first version.
+
+Prompt 1 – Backend audit
+
+```
+
+Audit the entire SportSpot backend. Check Firebase Authentication, Firestore collections, database indexes, security rules, API authorization and server-side validation.
+
+Verify that customers cannot access admin data or manipulate booking status and payment details.
+
+Identify missing backend functionality and fix it without removing existing features or changing the overall UI.
+
+```
+
+Prompt 2 – Double-booking prevention
+
+```
+
+Focus exclusively on the SportSpot booking engine.
+
+Implement and verify transactional slot locking for online and walk-in bookings. Test simultaneous booking requests, overlapping durations, temporary holds, payment failures, expired holds, cancellations and rescheduling.
+
+Use the same server-side availability logic for all booking sources.
+
+Do not consider the task finished until concurrent booking conflicts are safely handled.
+
+```
+
+Prompt 3 – Premium UI enhancement
+
+```
+
+Improve SportSpot's visual quality to the standard of a premium commercial sports-tech SaaS platform.
+
+Upgrade the homepage hero, turf visuals, animations, booking calendar, admin dashboard, analytical charts, navigation, cards and responsive mobile layouts.
+
+Use refined spacing, premium typography, interactive hover effects, subtle motion and professional visual hierarchy.
+
+Keep all existing backend functionality and database operations working. Do not replace functioning pages with static mockups.
+
+```
+
+Prompt 4 – Complete end-to-end testing
+
+```
+
+Act as a senior QA automation engineer.
+
+Test SportSpot from customer registration to booking confirmation and from owner login to walk-in booking and payment management.
+
+Verify all main pages, API endpoints, role permissions, booking conflicts, real-time synchronization, database persistence, payment handling and responsive layouts.
+
+Fix all reproducible bugs. Report each test as PASSED, FAILED or NOT RUN. Never claim a test passed unless it was actually executed.
+
+```
+
+## 7. My recommended build order
+
+| Stage | What to complete                         |
+| ----- | ---------------------------------------- |
+| 1     | Premium homepage and overall UI          |
+| 2     | Firebase setup and authentication        |
+| 3     | Customer profile and dashboard           |
+| 4     | Turf, court and pricing management       |
+| 5     | Real booking and slot-locking engine     |
+| 6     | Owner admin dashboard                    |
+| 7     | Walk-in booking and live synchronization |
+| 8     | Payments and notifications               |
+| 9     | Analytics and reports                    |
+| 10    | Security, testing and deployment         |
+
+One important point: AI Studio can generate the React frontend and server-side application and help provision Firebase, but real Razorpay transactions, email delivery, deployment permissions and production security still require the relevant credentials and configuration. Generated security rules must be reviewed before publishing.&#x20;
+
+[image](https://www.google.com/s2/favicons?domain=https://firebase.google.com\&sz=32)
+
+Firebase+2
+
+
+
+My recommendation is to complete the online booking and walk-in booking synchronization before spending too much time on advanced graphics. That's the core business logic of SportSpot.
+
+The final project should demonstrate three major things: an attractive commercial product, a genuinely working full-stack backend, and a reliable real-time booking system.
+
+Would a daily evening SportSpot development check-in be useful while building and testing the project?
+
+⚽Daily SportSpot build check-inTap to set up

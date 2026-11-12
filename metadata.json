@@ -1,0 +1,6 @@
+{
+  "name": "SportSpot — Smart Turf Booking & GPay Slot Management",
+  "description": "Full-stack sports turf booking and venue management SaaS with real-time slot synchronization, GPay QR advance payment screenshot verification, and one-click owner approval.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
