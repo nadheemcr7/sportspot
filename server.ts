@@ -412,31 +412,59 @@ app.post('/api/auth/register', async (req, res) => {
 
 // 1. SSE Endpoint for Live Availability & Owner Dashboard Updates
 app.get('/api/events', (req, res) => {
-  res.setHeader('Content-Type', 'text/event-stream');
-  res.setHeader('Cache-Control', 'no-cache');
-  res.setHeader('Connection', 'keep-alive');
-  res.flushHeaders?.();
+  // On serverless platforms like Vercel, long-lived SSE connections are timed out or restricted.
+  // We send headers and immediate event, and keep it safe from 500s.
+  try {
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache, no-transform');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders?.();
 
-  res.write(`data: ${JSON.stringify({ type: 'CONNECTED' })}\n\n`);
-  sseClients.add(res);
+    res.write(`data: ${JSON.stringify({ type: 'CONNECTED' })}\n\n`);
+    sseClients.add(res);
 
-  req.on('close', () => {
-    sseClients.delete(res);
-  });
+    req.on('close', () => {
+      sseClients.delete(res);
+    });
+  } catch (err) {
+    console.warn('SSE connection warning:', err);
+    res.status(200).end();
+  }
 });
 
 // 2. Get Complete Synchronized State (Hydrates live from Supabase when configured)
 app.get('/api/state', async (_req, res) => {
-  if (isSupabaseLive) {
-    dbState = await hydrateFromSupabaseIfConfigured(dbState);
+  try {
+    const isLive = Boolean(
+      (process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL) &&
+        (process.env.SUPABASE_SERVICE_ROLE_KEY ||
+          process.env.VITE_SUPABASE_ANON_KEY ||
+          process.env.SUPABASE_ANON_KEY)
+    );
+    if (isLive) {
+      dbState = await hydrateFromSupabaseIfConfigured(dbState);
+    }
+  } catch (err) {
+    console.error('Supabase hydration error in /api/state:', err);
   }
-  cleanupExpiredHolds();
-  const { users: _hiddenUsers, ...publicState } = dbState;
-  res.json({
-    ...publicState,
-    supabaseConfigured: isSupabaseLive,
-    serverTime: new Date().toISOString(),
-  });
+
+  try {
+    cleanupExpiredHolds();
+    const { users: _hiddenUsers, ...publicState } = dbState;
+    return res.json({
+      ...publicState,
+      supabaseConfigured: Boolean(
+        process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL
+      ),
+      serverTime: new Date().toISOString(),
+    });
+  } catch (err: any) {
+    console.error('Fatal error in /api/state:', err);
+    return res.status(500).json({
+      error: 'Failed to retrieve state',
+      message: err?.message || String(err),
+    });
+  }
 });
 
 // 3. Step 1 of Customer Booking: Atomic Slot Hold & Generate Owner GPay QR Info

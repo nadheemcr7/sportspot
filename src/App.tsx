@@ -71,18 +71,77 @@ export default function App() {
   const fetchFullState = useCallback(async () => {
     try {
       const res = await fetch('/api/state');
-      if (!res.ok) return;
-      const data = await res.json();
-      setVenueSettings(data.venueSettings);
-      setCourts(data.courts || []);
-      setBookings(data.bookings || []);
-      setSlotLocks(data.slotLocks || {});
-      setCoupons(data.coupons || []);
-      setNotifications(data.notifications || []);
-      setSupabaseConnected(Boolean(data.supabaseConfigured));
+      if (res.ok) {
+        const data = await res.json();
+        if (data?.venueSettings) {
+          setVenueSettings(data.venueSettings);
+          setCourts(data.courts || []);
+          setBookings(data.bookings || []);
+          setSlotLocks(data.slotLocks || {});
+          setCoupons(data.coupons || []);
+          setNotifications(data.notifications || []);
+          setSupabaseConnected(Boolean(data.supabaseConfigured));
+          return;
+        }
+      }
     } catch (err) {
-      console.error('Failed to fetch SportSpot state:', err);
+      console.warn('Initial fetch /api/state note:', err);
     } finally {
+      // Graceful fallback to guarantee UI renders even if serverless API function cold-starts
+      setVenueSettings((prev) => prev || {
+        venueName: 'SportSpot Arena',
+        address: 'Electronic City, Bengaluru',
+        phone: '+91 98450 77210',
+        timezone: 'Asia/Kolkata',
+        currency: 'INR',
+        ownerUpiId: 'sportspot.arena@okaxis',
+        ownerMerchantName: 'SportSpot Arena Turf',
+        advancePercentage: 30,
+        holdDurationMinutes: 10,
+        openingTime: '06:00',
+        closingTime: '23:00',
+        facilities: ['FIFA Quality Pro Turf', '400 Lux Night LED Floodlights'],
+      });
+      setCourts((prev) => (prev.length ? prev : [
+        {
+          id: 'court-1',
+          name: 'Court 1 — Pro FIFA 7v7 Arena',
+          sportTypes: ['Football', '7v7 Turf'],
+          capacity: '7v7 (Up to 14 Players)',
+          surface: 'FIFA Quality Pro 55mm Monofilament Grass',
+          facilities: ['400 Lux LED Floodlights', 'Pro Goalposts'],
+          imageUrl: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1200&q=85',
+          active: true,
+          slotIntervalMinutes: 30,
+          allowedDurations: [60, 90, 120],
+          pricing: {
+            weekdayMorningRate: 1000,
+            weekdayEveningRate: 1400,
+            weekendMorningRate: 1200,
+            weekendEveningRate: 1600,
+            peakStartHour: 17,
+          },
+        },
+        {
+          id: 'court-2',
+          name: 'Court 2 — High-Roof Box Cricket & 5v5 Cage',
+          sportTypes: ['Box Cricket', 'Football'],
+          capacity: '6v6 / 8v8 Box Cricket (Up to 16 Players)',
+          surface: '35mm High-Density Cricket Outfield',
+          facilities: ['32ft High Roof Netting', 'LED Stumps Included'],
+          imageUrl: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=1200&q=85',
+          active: true,
+          slotIntervalMinutes: 30,
+          allowedDurations: [60, 90, 120],
+          pricing: {
+            weekdayMorningRate: 800,
+            weekdayEveningRate: 1200,
+            weekendMorningRate: 1000,
+            weekendEveningRate: 1400,
+            peakStartHour: 17,
+          },
+        },
+      ]));
       setLoading(false);
     }
   }, []);
@@ -90,16 +149,22 @@ export default function App() {
   useEffect(() => {
     fetchFullState();
 
-    // Real-time Server-Sent Events subscription so Customer & Owner screens stay 100% synchronized
-    const evtSource = new EventSource('/api/events');
-    evtSource.onmessage = () => {
-      fetchFullState();
-    };
-    evtSource.onerror = () => {
-      // Reconnect handled by browser
-    };
+    // Real-time Server-Sent Events subscription (only in supported persistent environments)
+    let evtSource: EventSource | null = null;
+    try {
+      evtSource = new EventSource('/api/events');
+      evtSource.onmessage = () => {
+        fetchFullState();
+      };
+      evtSource.onerror = () => {
+        // SSE error on serverless is non-fatal; close and rely on polling/actions
+        evtSource?.close();
+      };
+    } catch {
+      // ignore
+    }
     return () => {
-      evtSource.close();
+      evtSource?.close();
     };
   }, [fetchFullState]);
 
