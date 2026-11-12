@@ -5,7 +5,7 @@ import {
   SlotLockRecord,
   SportType,
   VenueSettings,
-} from '../types/sportspot.ts';
+} from '../types/sportspot';
 
 export const COURT_1_IMAGE_URL =
   'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1200&q=85';

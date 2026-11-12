@@ -1,5 +1,4 @@
 import express from 'express';
-import { createServer as createViteServer } from 'vite';
 import fs from 'fs';
 import path from 'path';
 import dotenv from 'dotenv';
@@ -12,7 +11,7 @@ import {
   SportType,
   UserAccount,
   VenueSettings,
-} from './src/types/sportspot.ts';
+} from './src/types/sportspot';
 import {
   applyOwnerOneClickConfirmation,
   calculatePriceBreakdown,
@@ -20,7 +19,7 @@ import {
   generateAtomicUnitKeys,
   minutesToTime,
   timeToMinutes,
-} from './src/utils/bookingEngine.ts';
+} from './src/utils/bookingEngine';
 import {
   COURT_1_IMAGE_URL,
   COURT_2_IMAGE_URL,
@@ -29,7 +28,7 @@ import {
   invokeSupabaseOwnerConfirmRpc,
   syncStateToSupabase,
   uploadImageToSupabaseStorage,
-} from './src/lib/supabaseRest.ts';
+} from './src/lib/supabaseRest';
 
 dotenv.config();
 
@@ -1016,6 +1015,7 @@ async function startServer() {
   await ensureSupabaseHydrated();
 
   if (process.env.NODE_ENV !== 'production') {
+    const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',

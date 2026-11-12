@@ -31,6 +31,7 @@ import {
   calculatePriceBreakdown,
   computeDailySlotsForCourt,
 } from '../utils/bookingEngine';
+import { safeApiJson } from '../lib/apiClient';
 import {
   COURT_1_IMAGE_URL,
   COURT_2_IMAGE_URL,
@@ -195,7 +196,7 @@ export const CustomerPortal: React.FC<CustomerPortalProps> = ({
 
     setHoldingSlot(true);
     try {
-      const response = await fetch('/api/bookings/hold', {
+      const { ok, data } = await safeApiJson('/api/bookings/hold', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -212,9 +213,8 @@ export const CustomerPortal: React.FC<CustomerPortalProps> = ({
           payFullOnline,
         }),
       });
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error || 'Could not hold the selected slot.');
+      if (!ok) {
+        throw new Error(data?.error || 'Could not hold the selected slot.');
       }
 
       await onBookingCreatedOrUpdated();
@@ -228,8 +228,8 @@ export const CustomerPortal: React.FC<CustomerPortalProps> = ({
 
   const handleCancelBooking = async (bookingId: string) => {
     try {
-      const res = await fetch(`/api/bookings/${bookingId}/cancel`, { method: 'POST' });
-      if (res.ok) {
+      const { ok } = await safeApiJson(`/api/bookings/${bookingId}/cancel`, { method: 'POST' });
+      if (ok) {
         await onBookingCreatedOrUpdated();
         setBannerNotice('Reservation cancelled and turf slot released back to the public grid.');
       }

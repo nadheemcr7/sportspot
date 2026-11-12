@@ -28,6 +28,7 @@ import {
   buildUpiPaymentUri,
   computeDailySlotsForCourt,
 } from '../utils/bookingEngine';
+import { safeApiJson } from '../lib/apiClient';
 import { QrCodeSvg } from './QrCodeSvg';
 
 interface OwnerDashboardProps {
@@ -142,13 +143,12 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
   const handleOneClickConfirm = async (bookingId: string) => {
     setProcessingId(bookingId);
     try {
-      const res = await fetch(`/api/admin/bookings/${bookingId}/confirm-gpay`, {
+      const { ok, data } = await safeApiJson(`/api/admin/bookings/${bookingId}/confirm-gpay`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ownerEmail: 'owner@sportspot.in' }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to confirm booking');
+      if (!ok) throw new Error(data?.error || 'Failed to confirm booking');
       await onRefreshState();
       showToast(
         `Confirmed ${data.booking.bookingReference} (${data.booking.customerName}) — Advance ₹${data.booking.advanceAmount} verified & slot locked!`
@@ -164,15 +164,14 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
   const handleOneClickReject = async (bookingId: string) => {
     setProcessingId(bookingId);
     try {
-      const res = await fetch(`/api/admin/bookings/${bookingId}/reject-gpay`, {
+      const { ok, data } = await safeApiJson(`/api/admin/bookings/${bookingId}/reject-gpay`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           reason: 'GPay screenshot verification declined by owner. Slot released.',
         }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to reject booking');
+      if (!ok) throw new Error(data?.error || 'Failed to reject booking');
       await onRefreshState();
       showToast(
         `Rejected ${data.booking.bookingReference} — Slot ${data.booking.startTime} is now available again.`
@@ -188,11 +187,10 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
   const handleCollectVenueBalance = async (bookingId: string) => {
     setProcessingId(bookingId);
     try {
-      const res = await fetch(`/api/admin/bookings/${bookingId}/collect-balance`, {
+      const { ok, data } = await safeApiJson(`/api/admin/bookings/${bookingId}/collect-balance`, {
         method: 'POST',
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to record balance');
+      if (!ok) throw new Error(data?.error || 'Failed to record balance');
       await onRefreshState();
       showToast(
         `Full balance collected for ${data.booking.bookingReference} (Total ₹${data.booking.totalAmount} Paid).`
@@ -207,7 +205,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
   // Toggle Maintenance Block on a Court Slot
   const handleToggleMaintenance = async (courtId: string, startTime: string) => {
     try {
-      const res = await fetch('/api/admin/toggle-block', {
+      const { ok, data } = await safeApiJson('/api/admin/toggle-block', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -218,9 +216,8 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
           reason: 'Turf Maintenance / Rolling',
         }),
       });
-      const data = await res.json();
-      if (!res.ok) {
-        showToast(data.error || 'Cannot block booked slot');
+      if (!ok) {
+        showToast(data?.error || 'Cannot block booked slot');
         return;
       }
       await onRefreshState();
@@ -266,7 +263,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
 
     setWalkInSubmitting(true);
     try {
-      const res = await fetch('/api/admin/bookings/walk-in', {
+      const { ok, data } = await safeApiJson('/api/admin/bookings/walk-in', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -281,8 +278,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
           collectFullAmount: walkInCollectFull,
         }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Could not create walk-in booking');
+      if (!ok) throw new Error(data?.error || 'Could not create walk-in booking');
       await onRefreshState();
       setShowWalkInModal(false);
       setWalkInName('');
@@ -313,7 +309,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
     e.preventDefault();
     setSavingSettings(true);
     try {
-      const res = await fetch('/api/admin/settings', {
+      const { ok } = await safeApiJson('/api/admin/settings', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -327,7 +323,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
           holdDurationMinutes: Number(holdMinsInput),
         }),
       });
-      if (res.ok) {
+      if (ok) {
         await onRefreshState();
         showToast('Updated Venue Address, Contact Phone & Owner GPay QR settings.');
       }

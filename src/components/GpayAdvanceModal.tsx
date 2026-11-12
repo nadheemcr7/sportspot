@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { BookingRecord, VenueSettings } from '../types/sportspot';
 import { buildUpiPaymentUri } from '../utils/bookingEngine';
+import { safeApiJson } from '../lib/apiClient';
 import { QrCodeSvg } from './QrCodeSvg';
 
 interface GpayAdvanceModalProps {
@@ -84,7 +85,7 @@ export const GpayAdvanceModal: React.FC<GpayAdvanceModalProps> = ({
     setSubmitting(true);
     setErrorMsg(null);
     try {
-      const response = await fetch(`/api/bookings/${booking.id}/upload-screenshot`, {
+      const { ok, data } = await safeApiJson(`/api/bookings/${booking.id}/upload-screenshot`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -92,9 +93,8 @@ export const GpayAdvanceModal: React.FC<GpayAdvanceModalProps> = ({
           upiReferenceUtr: upiUtr.trim(),
         }),
       });
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to upload screenshot');
+      if (!ok) {
+        throw new Error(data?.error || 'Failed to upload screenshot');
       }
       onSubmitted(data.booking);
     } catch (err: any) {

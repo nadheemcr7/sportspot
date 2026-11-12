@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Lock, User, Phone, Shield, X, AlertCircle, UserPlus, LogIn } from 'lucide-react';
 import { UserAccount } from '../types/sportspot';
+import { safeApiJson } from '../lib/apiClient';
 
 export type AuthModalMode = 'PLAYER_LOGIN' | 'PLAYER_REGISTER' | 'OWNER_LOGIN';
 
@@ -58,14 +59,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               password: password.trim(),
             };
 
-      const res = await fetch(endpoint, {
+      const { ok, data } = await safeApiJson(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Authentication failed');
+      if (!ok) {
+        throw new Error(data?.error || 'Authentication failed');
       }
 
       if (mode === 'OWNER_LOGIN' && data.user?.role !== 'OWNER') {
