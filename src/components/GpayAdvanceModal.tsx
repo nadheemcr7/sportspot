@@ -1,20 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import {
-  CheckCircle2,
   Copy,
   Upload,
   Clock,
   FileCheck2,
   X,
   AlertCircle,
-  Sparkles,
   ShieldCheck,
 } from 'lucide-react';
 import { BookingRecord, VenueSettings } from '../types/sportspot';
-import {
-  buildUpiPaymentUri,
-  createSampleGpayReceiptDataUrl,
-} from '../utils/bookingEngine';
+import { buildUpiPaymentUri } from '../utils/bookingEngine';
 import { QrCodeSvg } from './QrCodeSvg';
 
 interface GpayAdvanceModalProps {
@@ -79,26 +74,10 @@ export const GpayAdvanceModal: React.FC<GpayAdvanceModalProps> = ({
     reader.readAsDataURL(file);
   };
 
-  const handleGenerateSampleReceipt = () => {
-    const generatedUtr = upiUtr.trim() || `6317${Math.floor(10000000 + Math.random() * 89999999)}`;
-    setUpiUtr(generatedUtr);
-    const sampleUrl = createSampleGpayReceiptDataUrl({
-      payerName: booking.customerName,
-      merchantName: venueSettings.ownerMerchantName,
-      merchantUpiId: venueSettings.ownerUpiId,
-      amount: booking.advanceAmount,
-      utrNumber: generatedUtr,
-      bookingReference: booking.bookingReference,
-      paidAtLabel: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    });
-    setScreenshotDataUrl(sampleUrl);
-    setErrorMsg(null);
-  };
-
   const handleSubmitProof = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!screenshotDataUrl) {
-      setErrorMsg('Please upload your Google Pay payment screenshot (or click "Generate Sample GPay Screenshot" to test).');
+      setErrorMsg('Please upload your Google Pay payment screenshot to lock your turf slot.');
       return;
     }
 
@@ -110,7 +89,7 @@ export const GpayAdvanceModal: React.FC<GpayAdvanceModalProps> = ({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           screenshotDataUrl,
-          upiReferenceUtr: upiUtr.trim() || `6317${Math.floor(10000000 + Math.random() * 89999999)}`,
+          upiReferenceUtr: upiUtr.trim(),
         }),
       });
       const data = await response.json();
@@ -142,7 +121,10 @@ export const GpayAdvanceModal: React.FC<GpayAdvanceModalProps> = ({
             <p className="text-xs font-mono text-[#A3E635]">
               SLOT TEMPORARILY HELD · REF {booking.bookingReference}
             </p>
-            <h2 id="gpay-modal-title" className="text-xl font-display font-bold tracking-wide text-white">
+            <h2
+              id="gpay-modal-title"
+              className="text-xl font-display font-bold tracking-wide text-white"
+            >
               Pay Advance via Owner’s GPay QR & Upload Screenshot
             </h2>
           </div>
@@ -230,7 +212,8 @@ export const GpayAdvanceModal: React.FC<GpayAdvanceModalProps> = ({
                   {booking.courtName} · {booking.sport}
                 </p>
                 <p className="text-xs font-mono text-slate-300 mt-1">
-                  {booking.bookingDate} · {booking.startTime} – {booking.endTime} ({booking.durationMinutes} mins)
+                  {booking.bookingDate} · {booking.startTime} – {booking.endTime} (
+                  {booking.durationMinutes} mins)
                 </p>
                 <p className="text-xs text-slate-400 mt-1">
                   Player: {booking.customerName} · {booking.customerPhone}
@@ -249,28 +232,18 @@ export const GpayAdvanceModal: React.FC<GpayAdvanceModalProps> = ({
                   type="text"
                   value={upiUtr}
                   onChange={(e) => setUpiUtr(e.target.value)}
-                  placeholder="e.g. 631784920115"
+                  placeholder="Enter 12-digit UPI UTR reference"
                   className="w-full px-3.5 py-2.5 bg-[#090D16] border border-slate-700 rounded-lg text-sm font-mono text-white placeholder-slate-500 focus:outline-none focus:border-[#A3E635]"
                 />
               </div>
 
               <div>
-                <div className="flex items-center justify-between gap-2 mb-1.5">
-                  <label
-                    htmlFor="gpay-screenshot-file"
-                    className="block text-xs font-medium text-slate-300 whitespace-nowrap"
-                  >
-                    Upload Google Pay Screenshot *
-                  </label>
-                  <button
-                    type="button"
-                    onClick={handleGenerateSampleReceipt}
-                    className="inline-flex items-center gap-1 text-xs font-medium text-[#A3E635] hover:underline whitespace-nowrap shrink-0"
-                  >
-                    <Sparkles className="w-3.5 h-3.5 shrink-0" />
-                    <span>Use Sample GPay Receipt</span>
-                  </button>
-                </div>
+                <label
+                  htmlFor="gpay-screenshot-file"
+                  className="block text-xs font-medium text-slate-300 mb-1.5"
+                >
+                  Upload Your Google Pay Screenshot *
+                </label>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <label
@@ -279,10 +252,10 @@ export const GpayAdvanceModal: React.FC<GpayAdvanceModalProps> = ({
                   >
                     <Upload className="w-6 h-6 text-slate-400 mb-2" />
                     <span className="text-xs font-medium text-slate-200">
-                      Click to upload image
+                      Click to select screenshot
                     </span>
                     <span className="text-[11px] text-slate-500 mt-1">
-                      PNG, JPG, or WEBP screenshot
+                      PNG, JPG, or WEBP from your phone/computer
                     </span>
                     <input
                       id="gpay-screenshot-file"
@@ -308,7 +281,7 @@ export const GpayAdvanceModal: React.FC<GpayAdvanceModalProps> = ({
                       </div>
                     ) : (
                       <p className="text-xs text-slate-500 text-center px-3">
-                        No screenshot selected yet. Upload a file or click “Attach Sample GPay Screenshot”.
+                        After paying ₹{booking.advanceAmount} on GPay, upload your receipt screenshot here.
                       </p>
                     )}
                   </div>
@@ -333,9 +306,7 @@ export const GpayAdvanceModal: React.FC<GpayAdvanceModalProps> = ({
                 disabled={submitting}
                 className="w-full sm:w-auto px-5 py-2.5 bg-[#A3E635] hover:bg-[#bef264] text-slate-950 font-semibold text-sm rounded-lg transition-colors whitespace-nowrap shrink-0 disabled:opacity-50"
               >
-                {submitting
-                  ? 'Uploading Proof...'
-                  : 'Submit Screenshot & Lock Slot'}
+                {submitting ? 'Uploading Proof...' : 'Submit Screenshot & Lock Slot'}
               </button>
             </div>
           </div>

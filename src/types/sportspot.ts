@@ -2,6 +2,17 @@ export type SportType = 'Football' | 'Box Cricket' | '7v7 Turf' | 'Pickleball';
 
 export type BookingSource = 'ONLINE' | 'WALK_IN';
 
+export type UserRole = 'CUSTOMER' | 'OWNER';
+
+export interface UserAccount {
+  id: string;
+  username: string;
+  displayName: string;
+  phone: string;
+  role: UserRole;
+  createdAt: string;
+}
+
 export type BookingStatus =
   | 'HOLD'
   | 'AWAITING_OWNER_APPROVAL'
@@ -85,6 +96,7 @@ export interface BookingRecord {
   id: string;
   bookingReference: string;
   userId: string;
+  customerUsername?: string;
   customerName: string;
   customerPhone: string;
   customerEmail: string;
