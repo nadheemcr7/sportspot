@@ -29,10 +29,6 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
   }, [activeView]);
 
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
-  }, [activeView]);
-
   const [venueSettings, setVenueSettings] = useState<VenueSettings>({
     venueName: 'SportSpot Arena — Electronic City Phase I',
     address: 'Plot 42, Velankani Tech Park Road, Electronic City, Bengaluru 560100',

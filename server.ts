@@ -3,7 +3,6 @@ import { createServer as createViteServer } from 'vite';
 import fs from 'fs';
 import path from 'path';
 import dotenv from 'dotenv';
-import { createClient } from '@supabase/supabase-js';
 import {
   BookingRecord,
   CouponRecord,
@@ -39,8 +38,6 @@ const isSupabaseLive = Boolean(
     !supabaseUrl.includes('your-project-id') &&
     !supabaseKey.includes('your-supabase')
 );
-
-export const supabaseAdmin = isSupabaseLive ? createClient(supabaseUrl, supabaseKey) : null;
 
 interface DatabaseShape {
   venueSettings: VenueSettings;
@@ -966,6 +963,7 @@ async function startServer() {
     dbState.venueSettings = {
       ...dbState.venueSettings,
       ...req.body,
+      ownerQrCustomUrl: req.body.ownerQrCustomUrl || '',
       advancePercentage: Number(req.body.advancePercentage ?? dbState.venueSettings.advancePercentage),
       holdDurationMinutes: Number(req.body.holdDurationMinutes ?? dbState.venueSettings.holdDurationMinutes),
     };

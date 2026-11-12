@@ -84,6 +84,9 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
   const [merchantNameInput, setMerchantNameInput] = useState<string>(
     venueSettings.ownerMerchantName
   );
+  const [customQrDataUrl, setCustomQrDataUrl] = useState<string>(
+    venueSettings.ownerQrCustomUrl || ''
+  );
   const [advancePctInput, setAdvancePctInput] = useState<number>(venueSettings.advancePercentage);
   const [holdMinsInput, setHoldMinsInput] = useState<number>(venueSettings.holdDurationMinutes);
   const [savingSettings, setSavingSettings] = useState<boolean>(false);
@@ -291,6 +294,18 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
     }
   };
 
+  const handleQrImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        setCustomQrDataUrl(reader.result);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleSaveSettings = async (e: React.FormEvent) => {
     e.preventDefault();
     setSavingSettings(true);
@@ -301,6 +316,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
         body: JSON.stringify({
           ownerUpiId: upiIdInput.trim(),
           ownerMerchantName: merchantNameInput.trim(),
+          ownerQrCustomUrl: customQrDataUrl || undefined,
           advancePercentage: Number(advancePctInput),
           holdDurationMinutes: Number(holdMinsInput),
         }),
@@ -1161,6 +1177,37 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
                   </div>
                 </div>
 
+                {/* Optional Custom GPay QR Image Upload */}
+                <div className="pt-2 border-t border-slate-800/80">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label
+                      htmlFor="owner-custom-qr-upload"
+                      className="block text-xs font-medium text-slate-300"
+                    >
+                      Upload Your Own GPay QR Image (Optional)
+                    </label>
+                    {customQrDataUrl && (
+                      <button
+                        type="button"
+                        onClick={() => setCustomQrDataUrl('')}
+                        className="text-xs text-red-400 hover:underline"
+                      >
+                        Reset to Dynamic Auto-QR
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-slate-400 mb-2">
+                    By default, SportSpot auto-generates a UPI QR from your UPI ID above with the exact advance amount pre-filled. Or upload your own GPay QR image here:
+                  </p>
+                  <input
+                    id="owner-custom-qr-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleQrImageUpload}
+                    className="block w-full text-xs text-slate-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-[#A3E635] hover:file:bg-slate-700 cursor-pointer"
+                  />
+                </div>
+
                 <button
                   type="submit"
                   disabled={savingSettings}
@@ -1171,18 +1218,28 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
               </form>
 
               <div className="md:col-span-5 bg-[#0F1624] border border-slate-800 rounded-2xl p-6 flex flex-col items-center justify-center text-center space-y-3">
-                <p className="text-xs font-mono text-[#A3E635]">LIVE CUSTOMER QR PREVIEW</p>
+                <p className="text-xs font-mono text-[#A3E635]">
+                  {customQrDataUrl ? 'CUSTOM UPLOADED GPAY QR' : 'LIVE DYNAMIC UPI QR PREVIEW'}
+                </p>
                 <p className="text-sm font-semibold text-white">{merchantNameInput}</p>
-                <QrCodeSvg
-                  value={buildUpiPaymentUri({
-                    upiId: upiIdInput,
-                    merchantName: merchantNameInput,
-                    amount: 420,
-                    bookingReference: 'SS-DEMO',
-                  })}
-                  size={172}
-                  label={upiIdInput}
-                />
+                {customQrDataUrl ? (
+                  <img
+                    src={customQrDataUrl}
+                    alt="Uploaded Owner GPay QR Code"
+                    className="w-44 h-44 object-contain bg-white p-2 rounded-xl border border-slate-700"
+                  />
+                ) : (
+                  <QrCodeSvg
+                    value={buildUpiPaymentUri({
+                      upiId: upiIdInput,
+                      merchantName: merchantNameInput,
+                      amount: 420,
+                      bookingReference: 'SS-DEMO',
+                    })}
+                    size={172}
+                    label={upiIdInput}
+                  />
+                )}
                 <p className="text-xs text-slate-400">
                   Customers scan this QR during checkout to pay their {advancePctInput}% advance
                   directly into your bank account.

@@ -1,5 +1,3 @@
-import { createClient } from '@supabase/supabase-js';
-
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
@@ -9,10 +7,6 @@ export const isSupabaseConfigured = Boolean(
     !supabaseUrl.includes('your-project-id') &&
     !supabaseAnonKey.includes('your-supabase-anon-key')
 );
-
-export const supabaseClient = isSupabaseConfigured
-  ? createClient(supabaseUrl, supabaseAnonKey)
-  : null;
 
 export const SUPABASE_GPAY_WORKFLOW_STEPS = [
   {
